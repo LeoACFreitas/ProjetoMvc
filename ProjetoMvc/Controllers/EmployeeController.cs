@@ -1,4 +1,5 @@
-﻿using ProjetoMvc.Model;
+﻿using ProjetoMvc.Filters;
+using ProjetoMvc.Model;
 using ProjetoMvc.Models;
 using ProjetoMvc.ViewModels;
 using System;
@@ -40,15 +41,20 @@ namespace ProjetoMvc.Controllers
             }
 
             employeeListViewModel.Employees = empViewModels;
+            employeeListViewModel.FooterData = new FooterViewModel();
+            employeeListViewModel.FooterData.CompanyName = "ACME";
+            employeeListViewModel.FooterData.Year = DateTime.Now.Year.ToString();
 
             return View("Index", employeeListViewModel);
         }
 
+        [AdminFilter]
         public ActionResult AddNew()
         {
             return View("CreateEmployee", new CreateEmployeeViewModel());
         }
 
+        [AdminFilter]
         public ActionResult SaveEmployee(Employee e, string BtnSubmit)
         {
             switch (BtnSubmit)
@@ -70,6 +76,18 @@ namespace ProjetoMvc.Controllers
                     return RedirectToAction("Index");
             }
             return new EmptyResult();
+        }
+
+        public ActionResult GetAddNewLink()
+        {
+            if (Convert.ToBoolean(Session["IsAdmin"]))
+            {
+                return PartialView("AddNewLink");
+            }
+            else
+            {
+                return new EmptyResult();
+            }
         }
     }
 }
